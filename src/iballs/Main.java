@@ -5,46 +5,51 @@ import java.util.List;
 
 public class Main {
 
+	public static final int nRows = 5;
+	public static final int nBits = 15;
 	
+	int[][] indexMatrix = new int[nRows][nRows];
+	List<Integer> testMasks = new LinkedList<Integer>();
+	List<Integer> solutions = new LinkedList<Integer>();
 	
-	public static List<Integer> makeMasks(int[][] idx, int[][] p) {
-		LinkedList<Integer> masks = new LinkedList<Integer>();
-		
-		int nx = idx.length;
-		int ny = idx[0].length;
-		
-		for (int y = 0; y < ny; ++y) {
-			for (int x = 0; x < nx; ++x) {			
+	int[][][] patterns  = {
+		{{0,0}, {0,1}, {1,1}}, //triangle
+		{{0,0}, {0,1}, {0,2}}, //vertical row
+		{{0,0}, {1,0}, {2,0}}, //horizontal row
+		{{0,0}, {1,1}, {2,2}}, //diagonal			
+	};	
+	
+	private void buildMasks(int[][] p) {			
+		for (int y = 0; y < nRows; ++y) {
+			for (int x = 0; x < nRows; ++x) {			
 				int mask = 0;
 				for (int[] xy : p) {
 					int tx = x + xy[0];
 				    int ty = y + xy[1];				    
-				    if ((tx >= nx) || (ty >= ny) || (idx[tx][ty] == -1)) {   				    						    	
+				    if ((tx >= nRows) || (ty >= nRows) || (indexMatrix[tx][ty] == -1)) {   				    						    	
 				    	mask = -1;
 				    	break;
 				    }				    
-				    mask |= (1 << idx[tx][ty]);
+				    mask |= (1 << indexMatrix[tx][ty]);
 				}								
 				if (mask != -1) {
-					masks.add(mask);
+					testMasks.add(mask);
 				}
 			}
 		}
-		
-		return masks;
 	}
 	
-	public static void printMask(int mask) {
-		for (int i = 0; i < 15; ++i) {
+	private void printMask(int mask) {
+		for (int i = 0; i < nBits; ++i) {
 			if ((mask & 1) != 0) {
-				System.out.print(i + " ");				
+				System.out.print(String.format("% 3d ", i));				
 			}			
 			mask >>= 1;
 		}
 		System.out.println();
 	}
 	
-	public static boolean checkState(int state, List<Integer> masks) {
+	private boolean checkState(int state) {
 		//check solid ball at center
 		if ((state & (1 << 4)) == 0) {
 			return false;
@@ -52,7 +57,7 @@ public class Main {
 		
 		//count number of solid balls, should be 8
 		int cnt = 0;
-		for (int i = 0; i < 15; ++i) {
+		for (int i = 0; i < nBits; ++i) {
 			if ((state & (1 << i)) != 0) {
 				++cnt;
 			}
@@ -62,7 +67,7 @@ public class Main {
 		}
 		
 		//check against mask set
-		for (Integer m : masks) {
+		for (Integer m : testMasks) {
 			if (((state & m) == m) || ((~state & m) == m)) {										
 				return false;
 			}
@@ -71,9 +76,9 @@ public class Main {
 		return true;
 	}
 	
-	public static void printState(int state) {		
-		for (int r = 0; r < 5; ++r) {
-			for (int n = 0; n < 4 - r; ++n) {
+	public void printSolution(int state) {		
+		for (int r = 0; r < nRows; ++r) {
+			for (int n = 0; n < nRows - r - 1; ++n) {
 				System.out.print(" ");
 			}
 			for (int n = 0; n <= r; ++n) {
@@ -85,55 +90,63 @@ public class Main {
 		System.out.println();
 	}
 	
-	
-	public static void main(String[] args) {
-		
-		int[][] idx = new int[5][5];
+	private void buildIndexMatrix() {
 		int num = 0;
-		for (int y = 0; y < 5; ++y) {
-			for (int x = 0; x < 5; ++x) {			
-				idx[x][y] = (x <= y)?num++:-1;
+		for (int y = 0; y < nRows; ++y) {
+			for (int x = 0; x < nRows; ++x) {			
+				indexMatrix[x][y] = (x <= y)?num++:-1;
 			}
-		}
-		
-		
-		System.out.println("index matrix: ");
-		for (int y = 0; y < 5; ++y) {
-			for (int x = 0; x < 5; ++x) {
-				System.out.print(idx[x][y] + " ");
+		}		
+	}
+	
+	private void printIndexMatrix() {
+		for (int y = 0; y < nRows; ++y) {
+			for (int x = 0; x < nRows; ++x) {
+				System.out.print(String.format("% 3d ", indexMatrix[x][y]));
 			}
 			System.out.println();
-		}
+		}	
+	}
+	
+	private void solve() {
+		for (int state = 0; state < 32768; ++state) {
+			if (checkState(state)) {
+				solutions.add(state);								
+			}
+		}		
+	}
+	
+	
+	public void run() {				
+		buildIndexMatrix();
+		
+		System.out.println("index matrix: ");
+		printIndexMatrix();
 		System.out.println();
 		
-		int[][][] patterns  = {
-			{{0,0}, {0,1}, {1,1}}, //triangle
-			{{0,0}, {0,1}, {0,2}}, //vertical row
-			{{0,0}, {1,0}, {2,0}}, //horizontal row
-			{{0,0}, {1,1}, {2,2}}, //diagonal			
-		};
-				
-		List<Integer> masks = new LinkedList<Integer>();
 		for (int[][] p : patterns) {			
-			masks.addAll(makeMasks(idx, p));
+			buildMasks(p);
 		}
 		
 		System.out.println("check mask list: ");
-		for (Integer mask : masks) {			
+		for (Integer mask : testMasks) {			
 			printMask(mask);
 		}
 		System.out.println();
 		
-		System.out.println("valid states: ");
-		int cnt = 0;
-		for (int state = 0; state < 32768; ++state) {
-			if (checkState(state, masks)) {
-				++cnt;
-				printState(state);
-			}
-		}		
-		System.out.println();
-		System.out.println("total count: " + cnt);
+		solve();
 		
+		System.out.println("solutions: ");
+		for (Integer s : solutions) {
+			printSolution(s);
+		}		
+
+		System.out.println();
+		System.out.println("total count: " + solutions.size());
+		
+	}
+	
+	public static void main(String[] args) {
+		new Main().run();
 	}
 }
