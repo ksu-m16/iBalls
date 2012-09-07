@@ -1,24 +1,15 @@
 package iballs;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
-import java.awt.image.ImageObserver;
-import java.io.IOException;
-import java.net.URL;
-import java.util.BitSet;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
 
+@SuppressWarnings("serial")
 public class HeliView extends JFrame {
 
 	private JPanel contentPane;
