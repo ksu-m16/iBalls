@@ -1,5 +1,6 @@
 package iballs;
 
+import java.awt.EventQueue;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -143,7 +144,10 @@ public class Main {
 
 		System.out.println();
 		System.out.println("total count: " + solutions.size());
-		
+
+		View v = new View();
+		v.setSolutions(solutions);
+		v.setVisible(true);		
 	}
 	
 	public static void main(String[] args) {
