@@ -15,6 +15,7 @@ public class Main {
 	
 	int[][][] patterns  = {
 		{{0,0}, {0,1}, {1,1}}, //triangle
+		{{0,0}, {1,0}, {0,1}}, //inverted triangle
 		{{0,0}, {0,1}, {0,2}}, //vertical row
 		{{0,0}, {1,0}, {2,0}}, //horizontal row
 		{{0,0}, {1,1}, {2,2}}, //diagonal			
